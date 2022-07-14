@@ -1,10 +1,11 @@
 'use strict';
 
 var findPath = require('./dijkstra'),
-    preprocess = require('./preprocessor'),
-    compactor = require('./compactor'),
-    roundCoord = require('./round-coord');
+preprocess = require('./preprocessor'),
+compactor = require('./compactor'),
+roundCoord = require('./round-coord');
 
+import nearestPoint from '@turf/nearest-point';
 
 
 
