@@ -4,10 +4,12 @@ var findPath = require('./dijkstra'),
     preprocess = require('./preprocessor'),
     compactor = require('./compactor'),
     roundCoord = require('./round-coord');
+distance = require('@turf/distance').default,
+    point = require('turf-point');
 
 module.exports = PathFinder;
 
-function PathFinder(graph, options) {    
+function PathFinder(graph, options) {
     options = options || {};
 
     if (!graph.compactedVertices) {
@@ -15,19 +17,19 @@ function PathFinder(graph, options) {
     }
 
     this._graph = graph;
-    this._keyFn = options.keyFn || function(c) {
+    this._keyFn = options.keyFn || function (c) {
         return c.join(',');
     };
     this._precision = options.precision || 1e-5;
     this._options = options;
 
-    if (Object.keys(this._graph.compactedVertices).filter(function(k) { return k !== 'edgeData'; }).length === 0) {
+    if (Object.keys(this._graph.compactedVertices).filter(function (k) { return k !== 'edgeData'; }).length === 0) {
         throw new Error('Compacted graph contains no forks (topology has no intersections).');
     }
 }
 
 PathFinder.prototype = {
-    findPath: function(a, b) {
+    findPath: function (a, b) {
         var start = this._keyFn(roundCoord(a.geometry.coordinates, this._precision)),
             finish = this._keyFn(roundCoord(b.geometry.coordinates, this._precision));
 
@@ -54,7 +56,7 @@ PathFinder.prototype = {
                     return cs;
                 }.bind(this), []).concat([this._graph.sourceVertices[finish]]),
                 weight: weight,
-                edgeDatas: this._graph.compactedEdges 
+                edgeDatas: this._graph.compactedEdges
                     ? path.reduce(function buildEdgeData(eds, v, i, vs) {
                         if (i > 0) {
                             eds.push({
@@ -74,11 +76,28 @@ PathFinder.prototype = {
         this._removePhantom(phantomEnd);
     },
 
-    serialize: function() {
+    serialize: function () {
         return this._graph;
     },
 
-    _createPhantom: function(n) {
+    findNearestJunction: function (p) {
+        var vertex = [null, Number.MAX_VALUE];
+        var junctions = Object.keys(this._graph.vertices).filter((function (k) {
+            var nEdges = Object.keys(this._graph.vertices[k]).length;
+            return nEdges >= 3 || nEdges == 1;
+        }).bind(this));
+
+        junctions.forEach((function (k) {
+            const dist = distance(point(p), point(this._graph.sourceVertices[k]));
+            if (dist < vertex[1]) {
+                vertex[1] = dist;
+                vertex[0] = this._graph.sourceVertices[k].slice(0);
+            }
+        }).bind(this));
+        return vertex;
+    },
+
+    _createPhantom: function (n) {
         if (this._graph.compactedVertices[n]) return null;
 
         var phantom = compactor.compactNode(n, this._graph.vertices, this._graph.compactedVertices, this._graph.sourceVertices, this._graph.edgeData, true, this._options);
@@ -89,7 +108,7 @@ PathFinder.prototype = {
             this._graph.compactedEdges[n] = phantom.reducedEdges;
         }
 
-        Object.keys(phantom.incomingEdges).forEach(function(neighbor) {
+        Object.keys(phantom.incomingEdges).forEach(function (neighbor) {
             this._graph.compactedVertices[neighbor][n] = phantom.incomingEdges[neighbor];
             this._graph.compactedCoordinates[neighbor][n] = phantom.incomingCoordinates[neighbor];
             if (this._graph.compactedEdges) {
@@ -100,17 +119,17 @@ PathFinder.prototype = {
         return n;
     },
 
-    _removePhantom: function(n) {
+    _removePhantom: function (n) {
         if (!n) return;
 
-        Object.keys(this._graph.compactedVertices[n]).forEach(function(neighbor) {
+        Object.keys(this._graph.compactedVertices[n]).forEach(function (neighbor) {
             delete this._graph.compactedVertices[neighbor][n];
         }.bind(this));
-        Object.keys(this._graph.compactedCoordinates[n]).forEach(function(neighbor) {
+        Object.keys(this._graph.compactedCoordinates[n]).forEach(function (neighbor) {
             delete this._graph.compactedCoordinates[neighbor][n];
         }.bind(this));
         if (this._graph.compactedEdges) {
-            Object.keys(this._graph.compactedEdges[n]).forEach(function(neighbor) {
+            Object.keys(this._graph.compactedEdges[n]).forEach(function (neighbor) {
                 delete this._graph.compactedEdges[neighbor][n];
             }.bind(this));
         }
