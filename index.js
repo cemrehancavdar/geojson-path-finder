@@ -5,7 +5,7 @@ import findPath from './dijkstra'
 import preprocess from './preprocessor'
 import roundCoord from './round-coord'
 import nearestPoint from '@turf/nearest-point'
-import { point } from '@turf/helpers'
+import { point, featureCollection } from '@turf/helpers'
 
 
 
