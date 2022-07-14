@@ -4,8 +4,12 @@ var findPath = require('./dijkstra'),
     preprocess = require('./preprocessor'),
     compactor = require('./compactor'),
     roundCoord = require('./round-coord');
-distance = require('@turf/distance').default,
+    distance = require('@turf/distance'),
     point = require('turf-point');
+
+    if (typeof distance !== 'function' && distance.default && typeof distance.default === 'function') {
+        distance = distance.default;
+    }
 
 module.exports = PathFinder;
 
