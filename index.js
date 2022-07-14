@@ -1,12 +1,11 @@
 'use strict';
 
-var findPath = require('./dijkstra'),
-preprocess = require('./preprocessor'),
-compactor = require('./compactor'),
-roundCoord = require('./round-coord'),
-nearestPoint = require('@turf/nearest-point'),
-point = require('@turf/helpers');
-
+import { compactNode } from './compactor'
+import findPath from './dijkstra'
+import preprocess from './preprocessor'
+import roundCoord from './round-coord'
+import nearestPoint from '@turf/nearest-point'
+import { point } from '@turf/helpers'
 
 
 module.exports = PathFinder;
@@ -86,7 +85,7 @@ PathFinder.prototype = {
     serialize: function () {
         return this._graph;
     },
-    
+
     findPathWithNearbyPoints: function (start, finish) {
         // Find closest node in base set... do this search for both at the same time?
         const startNearest = nearestPoint(start.geometry.coordinates, this._fc)
