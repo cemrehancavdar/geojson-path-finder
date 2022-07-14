@@ -8,9 +8,8 @@ import nearestPoint from '@turf/nearest-point'
 import { point } from '@turf/helpers'
 
 
-module.exports = PathFinder;
 
-function PathFinder(graph, options) {
+export default function PathFinder(graph, options) {
     options = options || {};
 
     if (!graph.compactedVertices) {
