@@ -27,6 +27,11 @@ function PathFinder(graph, options) {
     if (Object.keys(this._graph.compactedVertices).filter(function (k) { return k !== 'edgeData'; }).length === 0) {
         throw new Error('Compacted graph contains no forks (topology has no intersections).');
     }
+
+    this._points = Object.keys(this._graph.compactedVertices).map(function (coord) {
+        return point(coord.split(','))
+    })
+    this._fc = featureCollection(this._points)
 }
 
 PathFinder.prototype = {
@@ -80,7 +85,25 @@ PathFinder.prototype = {
     serialize: function () {
         return this._graph;
     },
+    
+    findPathWithNearbyPoints: function (start, finish) {
+        // Find closest node in base set... do this search for both at the same time?
+        const startNearest = nearestPoint(start.geometry.coordinates, this._fc)
+        const finishNearest = nearestPoint(finish.geometry.coordinates, this._fc)
 
+        const startNearestCoord = startNearest.geometry.coordinates
+        const finishNearestCoord = finishNearest.geometry.coordinates
+
+        var route = this.findPath(startNearestCoord, finishNearestCoord)
+        if (!route || !route.path) {
+            return null
+        }
+        const pointArr = route.path.map(function (coords) {
+            return point(coords)
+        })
+        route.featureCollection = featureCollection(pointArr)
+        return route
+    },
     _createPhantom: function (n) {
         if (this._graph.compactedVertices[n]) return null;
 
