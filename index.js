@@ -90,8 +90,8 @@ PathFinder.prototype = {
         const startNearest = nearestPoint(start.geometry.coordinates, this._fc)
         const finishNearest = nearestPoint(finish.geometry.coordinates, this._fc)
 
-        const startNearestCoord = startNearest.geometry.coordinates
-        const finishNearestCoord = finishNearest.geometry.coordinates
+        const startNearestCoord = startNearest
+        const finishNearestCoord = finishNearest
 
         var route = this.findPath(startNearestCoord, finishNearestCoord)
         if (!route || !route.path) {
