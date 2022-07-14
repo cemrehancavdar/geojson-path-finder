@@ -5,6 +5,7 @@ preprocess = require('./preprocessor'),
 compactor = require('./compactor'),
 roundCoord = require('./round-coord'),
 nearestPoint = require('@turf/nearest-point');
+point = require('@turf/helpers');
 
 
 

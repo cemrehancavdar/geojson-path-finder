@@ -20,7 +20,8 @@
     "tap-spec": "^5.0.0",
     "tinyqueue": "^2.0.0",
     "turf-point": "^2.0.1",
-    "@turf/nearest-point": "^6.0.1"
+    "@turf/nearest-point": "^6.0.1",
+    "@turf/helpers": "6.0.1"
   },
   "devDependencies": {
     "@types/geojson": "^7946.0.8"
