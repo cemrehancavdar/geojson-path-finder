@@ -19,6 +19,7 @@ declare module 'geojson-path-finder' {
     export default class PathFinder<A = undefined, G = GeoJsonProperties> {
         constructor(geoJson: FeatureCollection<LineString, G>, options?: PathFinderOptions<A, G>)
 
-        findPath(start: Feature<Point>, finish: Feature<Point>): Route<A>
+        findPath(start: Feature<Point>, finish: Feature<Point>): Route<A> | null
+        findPathWithNearbyPoints(start: Feature<Point>, finish: Feature<Point>): Route<A> | null
     }
 }
